@@ -92,12 +92,27 @@ vim /mnt/etc/nixos/hosts/<hostname>/hardware-configuration.nix
 
 # 9. Install
 # ----------
+cd /mnt/etc/nixos
+git add .
 cd /mnt
-sudo nixos-install --flake /mnt/etc/nixos#<hostname>
+nixos-install --flake /mnt/etc/nixos#<hostname> --option experimental-features "nix-command flakes"
 
-# If the installer complains about experimental features:
-# sudo nixos-install --flake /mnt/etc/nixos#<hostname> --option experimental-features "nix-command flakes"
+# 10. Set user password:
+nixos-enter --root /mnt
+passwd dylan
 
-# 10. Reboot
+# 11. Reboot
 # ----------
 reboot
+
+# 12. After Reboot
+
+# Generate github key:
+sudo ssh-keygen -t ed25519 -C "accounts@dylankirdahy.nyc"
+sudo cat /root/.ssh/id_ed25519.pub
+# Add it to github
+
+
+# Add a new linux server on tailscale
+sudo tailscale up --auth-key=<key-string>
+# Copy over ssh keys
