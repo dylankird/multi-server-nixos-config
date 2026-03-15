@@ -1,5 +1,5 @@
 {
-  description = "Multi-machine NixOS configuration (Lenovo laptop + AMD desktop)";
+  description = "Multi-machine NixOS configuration (NAS, Framework Desktop, LattePanda)";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
@@ -20,6 +20,7 @@
         specialArgs = { inherit inputs; };
         modules = [
           ./modules/common.nix
+          ./modules/networking.nix
           ./modules/packages.nix
           ./hosts/diy-nas
           {
@@ -33,6 +34,7 @@
         specialArgs = { inherit inputs; };
         modules = [
           ./modules/common.nix
+          ./modules/networking.nix
           ./modules/gnome-desktop.nix
           ./modules/packages.nix
           ./hosts/framework
@@ -54,8 +56,9 @@
         specialArgs = { inherit inputs; };
         modules = [
           ./modules/common.nix
+          ./modules/networking.nix
           ./modules/packages.nix
-          ./hosts/diy-nas
+          ./hosts/lattepanda
           {
             nixpkgs.overlays = [ nur.overlays.default ];
           }

@@ -12,6 +12,12 @@
 
   networking.hostName = "diy-nas";
 
+  # Swap file (8GB)
+  swapDevices = [{
+    device = "/var/lib/swapfile";
+    size = 8 * 1024;
+  }];
+
   # Use latest kernel - probably shouldn't do this for compatability reasons
   #boot.kernelPackages = pkgs.linuxPackages_latest;
 
