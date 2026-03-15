@@ -2,8 +2,10 @@
 { config, pkgs, ... }:
 
 {
-  # Networking
+  # Networking with iwd for WiFi
   networking.networkmanager.enable = true;
+  networking.networkmanager.wifi.backend = "iwd";
+  networking.wireless.iwd.enable = true;
 
   # SSH - key-based auth only, no root login
   services.openssh = {

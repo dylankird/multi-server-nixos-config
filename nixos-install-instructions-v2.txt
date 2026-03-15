@@ -1,8 +1,8 @@
 # NixOS Server Installation (No Encryption)
 # ==========================================
 
-# Connect to WiFi if needed
-# nmtui or: wpa_supplicant -B -i wlan0 -c <(wpa_passphrase SSID PASS)
+# Connect to WiFi if needed (NixOS installer includes iwd)
+# iwctl station wlan0 connect SSID
 
 sudo su
 
