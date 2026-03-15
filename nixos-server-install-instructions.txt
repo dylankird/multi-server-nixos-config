@@ -117,6 +117,11 @@ cd /etc/nixos
 sudo git remote set-url origin git@github.com:dylankird/multi-server-nixos-config.git
 
 # Temporarily allow password login and send over ssh keys
+# Do this by temporarily switching modules/networking.nix to modules/networking-unsafe.nix in flake.nix
+# rebuild
+# run ssh-copy-id <ip-address> on your desktop
+# fix flake.nix
+# rebuild
 
 # Add a new linux server on tailscale
 sudo tailscale up --auth-key=<key-string>
