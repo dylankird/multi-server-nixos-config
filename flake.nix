@@ -15,18 +15,27 @@
   outputs = { self, nixpkgs, home-manager, nur, ... }@inputs: {
     nixosConfigurations = {
 
-      lenovo-nixos = nixpkgs.lib.nixosSystem {
+      diy-nas = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        specialArgs = { inherit inputs; };
+        modules = [
+          ./modules/common.nix
+          ./modules/packages.nix
+          ./hosts/diy-nas
+          {
+            nixpkgs.overlays = [ nur.overlays.default ];
+          }
+        ];
+      };
+
+      framework = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         specialArgs = { inherit inputs; };
         modules = [
           ./modules/common.nix
           ./modules/gnome-desktop.nix
-          ./modules/virtualization.nix
-          ./modules/gaming.nix
           ./modules/packages.nix
-		  ./modules/lenovo-yoga-speakers.nix
-		  ./modules/pipewire-eq.nix
-          ./hosts/lenovo
+          ./hosts/framework
           home-manager.nixosModules.home-manager
           {
             home-manager.useGlobalPkgs = true;
@@ -40,28 +49,19 @@
         ];
       };
 
-      desktop-nixos = nixpkgs.lib.nixosSystem {
+      lattepanda = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         specialArgs = { inherit inputs; };
         modules = [
           ./modules/common.nix
-          ./modules/gnome-desktop.nix
-          ./modules/virtualization.nix
-          ./modules/gaming.nix
           ./modules/packages.nix
-          ./hosts/desktop
-          home-manager.nixosModules.home-manager
-          {
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
-            home-manager.backupFileExtension = "backup";
-            home-manager.users.dylan = import ./home/dylan.nix;
-          }
+          ./hosts/diy-nas
           {
             nixpkgs.overlays = [ nur.overlays.default ];
           }
         ];
       };
+
     };
   };
 }
