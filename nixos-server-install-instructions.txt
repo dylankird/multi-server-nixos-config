@@ -111,8 +111,14 @@ reboot
 sudo ssh-keygen -t ed25519 -C "accounts@dylankirdahy.nyc"
 sudo cat /root/.ssh/id_ed25519.pub
 # Add it to github
+sudo git config --global user.email "accounts@dylankirdah.nyc"
+sudo git config --global user.name "Dylan Kirdahy"
+cd /etc/nixos
+sudo git remote set-url origin git@github.com:dylankird/multi-server-nixos-config.git
 
+# Temporarily allow password login and send over ssh keys
 
 # Add a new linux server on tailscale
 sudo tailscale up --auth-key=<key-string>
-# Copy over ssh keys
+
+
