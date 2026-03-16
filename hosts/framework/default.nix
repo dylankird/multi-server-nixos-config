@@ -10,6 +10,9 @@
     ./hardware-configuration.nix
   ];
 
+  # For headless operation:
+  boot.kernelParams = [ "video=Virtual-1:1920x1080@60" ];
+
   networking.hostName = "framework";
 
   # Swap file (64GB for unified memory as VRAM)
