@@ -4,8 +4,8 @@
 {
   # X11 and GNOME
   services.xserver.enable = true;
-  services.displayManager.gdm.enable = true;
-  services.displayManager.gdm.autoLogin = {
+  services.displayManager.enable = true;
+  services.displayManager.autoLogin = {
     enable = true;
 	user = "dylan";
   };
