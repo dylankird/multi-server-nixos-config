@@ -5,7 +5,16 @@
   # X11 and GNOME
   services.xserver.enable = true;
   services.displayManager.gdm.enable = true;
+  services.xserver.displayManager.gdm.autoLogin = {
+    enable = true;
+	user = "dylan";
+  };
   services.desktopManager.gnome.enable = true;
+
+  # This workaround is needed because of a GNOME race condition
+  # that can cause the login to fail on first boot
+  systemd.services."getty@tty1".enable = false;
+  systemd.services."autovt@tty1".enable = false;
 
   # Keymap
   services.xserver.xkb = {
