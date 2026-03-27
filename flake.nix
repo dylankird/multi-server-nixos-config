@@ -22,6 +22,7 @@
           ./modules/common.nix
           ./modules/networking.nix
           ./modules/packages.nix
+		  ./modules/virtualization.nix
           ./hosts/diy-nas
           {
             nixpkgs.overlays = [ nur.overlays.default ];

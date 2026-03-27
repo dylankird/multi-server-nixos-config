@@ -2,11 +2,13 @@
 { config, pkgs, ... }:
 
 {
-  # virt-manager and KVM for GNOME Boxes
-  programs.virt-manager.enable = true;
+  # KVM/libvirt for headless VM hosting
+  virtualisation.libvirtd = {
+    enable = true;
+    qemu.vhostUserPackages = [ pkgs.virtiofsd ];
+  };
+
   users.groups.libvirtd.members = [ "dylan" ];
-  virtualisation.libvirtd.enable = true;
-  virtualisation.spiceUSBRedirection.enable = true;
 
   # Podman with Docker compatibility
   virtualisation.podman = {
@@ -16,6 +18,5 @@
 
   environment.systemPackages = with pkgs; [
     distrobox
-    gnome-boxes
   ];
 }
