@@ -61,6 +61,9 @@ fileSystems."/home/dylan/pool/network-storage" = {
   options = [ "subvol=@network-storage" "compress=zstd" "noatime" ];
 };
 
+# Bridged networking for the VM
+networking.bridges.br0.interfaces = [ "wlan0" ];
+networking.interfaces.br0.useDHCP = true;
 
   system.stateVersion = "25.11";
 }
