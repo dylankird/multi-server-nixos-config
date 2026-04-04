@@ -62,7 +62,7 @@ fileSystems."/home/dylan/pool/network-storage" = {
 };
 
 # Bridged networking for the VM
-networking.bridges.br0.interfaces = [ "wlan0" ];
+networking.bridges.br0.interfaces = [ "enp3s0" ];
 networking.interfaces.br0.useDHCP = true;
 
   system.stateVersion = "25.11";
