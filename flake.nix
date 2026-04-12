@@ -66,6 +66,22 @@
         ];
       };
 
+      bard-frigate = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        specialArgs = { inherit inputs; };
+        modules = [
+          ./modules/common.nix
+          ./modules/networking.nix
+          ./modules/packages.nix
+          ./hosts/bard-frigate
+          {
+            nixpkgs.overlays = [ nur.overlays.default ];
+          }
+        ];
+      };
+
+
+
     };
   };
 }

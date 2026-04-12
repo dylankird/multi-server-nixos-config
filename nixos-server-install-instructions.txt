@@ -66,6 +66,7 @@ mount -o subvol=@home,compress=zstd,noatime /dev/disk/by-label/NIXHOME /mnt/home
 git clone git@github.com:dylankird/multi-server-nixos-config.git /mnt/etc/nixos
 # Or use HTTPS if SSH keys are not available:
 # git clone https://github.com/dylankird/multi-server-nixos-config.git /mnt/etc/nixos
+# Put in the steps here for github temp access token
 
 # 6. Generate hardware configuration
 # -----------------------------------
@@ -107,6 +108,14 @@ reboot
 
 # 12. After Reboot
 
+# Temporarily allow password login and send over ssh keys
+# Do this by temporarily switching modules/networking.nix to modules/networking-unsafe.nix in flake.nix
+# rebuild
+# run ssh-copy-id <ip-address> on your desktop
+# fix flake.nix
+# rebuild
+
+
 # Generate github key:
 sudo ssh-keygen -t ed25519 -C "accounts@dylankirdahy.nyc"
 sudo cat /root/.ssh/id_ed25519.pub
@@ -115,13 +124,8 @@ sudo git config --global user.email "accounts@dylankirdah.nyc"
 sudo git config --global user.name "Dylan Kirdahy"
 cd /etc/nixos
 sudo git remote set-url origin git@github.com:dylankird/multi-server-nixos-config.git
+# Git push the new config
 
-# Temporarily allow password login and send over ssh keys
-# Do this by temporarily switching modules/networking.nix to modules/networking-unsafe.nix in flake.nix
-# rebuild
-# run ssh-copy-id <ip-address> on your desktop
-# fix flake.nix
-# rebuild
 
 # Add a new linux server on tailscale
 sudo tailscale up --auth-key=<key-string>
