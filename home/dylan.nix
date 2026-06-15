@@ -1,5 +1,5 @@
 # Shared Home Manager configuration for user dylan
-{ pkgs, ... }:
+{ pkgs, osConfig, ... }:
 
 {
   home.packages = [ ];
@@ -119,5 +119,5 @@
     };
   };
 
-  home.stateVersion = "25.11";
+  home.stateVersion = osConfig.system.stateVersion;
 }
