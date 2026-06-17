@@ -47,4 +47,14 @@
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
+
+  # Share bash history across all terminals, nix shell subshells, and tmux panes
+  programs.bash.interactiveShellInit = ''
+    HISTSIZE=100000
+    HISTFILESIZE=200000
+    HISTCONTROL=ignoredups:erasedups
+    shopt -s histappend
+    # Sync history after every command so all terminals share one live history
+    PROMPT_COMMAND="history -a; history -c; history -r''${PROMPT_COMMAND:+; $PROMPT_COMMAND}"
+  '';
 }

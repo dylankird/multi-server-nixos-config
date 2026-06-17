@@ -4,20 +4,6 @@
 {
   home.packages = [ ];
 
-# Share bash history across all terminals, nix shell subshells, and tmux panes
-  programs.bash = {
-    enable = true;
-    historySize = 100000;
-    historyFileSize = 200000;
-    historyControl = [ "ignoredups" "erasedups" ];
-    shellOptions = [ "histappend" ];
-    initExtra = ''
-      # Sync history after every command so all terminals share one live history
-      PROMPT_COMMAND="history -a; history -c; history -r''${PROMPT_COMMAND:+; $PROMPT_COMMAND}"
-    '';
-  };
-
-
   programs.firefox = {
     enable = true;
     profiles = {
