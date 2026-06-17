@@ -21,6 +21,7 @@
 	cowsay
 	ncdu
 	tailscale
+	gptfdisk
 
 	# Vim with vimrc:
 	(vim-full.customize {
