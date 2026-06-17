@@ -21,6 +21,12 @@
   # Use latest kernel - probably shouldn't do this for compatability reasons
   #boot.kernelPackages = pkgs.linuxPackages_latest;
 
+  fileSystems."/home/dylan/storage" = {
+    device = "/dev/disk/by-uuid/18db546c-556b-4824-abf2-c72b66ad5bbc";
+    fsType = "btrfs";
+    options = [ "subvol=@storage" "compress=zstd" "noatime" ];
+  };
+
 
   # bard-frigate specific packages
   environment.systemPackages = with pkgs; [
