@@ -78,6 +78,10 @@
       mqtt.enabled = false;
       auth.enabled = false;
 
+      go2rtc.streams.cam1 = [
+        "rtsp://{FRIGATE_CAM1_USER}:{FRIGATE_CAM1_PASSWORD}@192.168.1.114:554/h264Preview_01_main"
+      ];
+
       detectors.coral = {
         type   = "edgetpu";
         device = "pci";
