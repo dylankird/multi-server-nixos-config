@@ -112,7 +112,14 @@
   };
 
   # Camera credentials — file created manually on host, not in git
-  systemd.services.frigate.serviceConfig.EnvironmentFile = "/var/lib/frigate/.env";
+  systemd.services.frigate.serviceConfig = {
+    EnvironmentFile = "/var/lib/frigate/.env";
+    # Ensure storage dirs are owned by frigate before each start.
+    # The bind-mount activation creates these as root, so we fix ownership here.
+    ExecStartPre = [
+      "+${pkgs.coreutils}/bin/chown -R frigate:frigate /home/dylan/storage/frigate"
+    ];
+  };
 
   system.stateVersion = "25.11";
 }
