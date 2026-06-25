@@ -70,13 +70,11 @@
     enable      = true;
     hostname    = "bard-frigate";
     vaapiDriver = "iHD";
-    # checkConfig = false because RTSP URLs contain {FRIGATE_*} env vars that
-    # can't be resolved at build time in the Nix sandbox
-    checkConfig = false;
 
     settings = {
       mqtt.enabled = false;
-      auth.enabled = false;
+      # auth enabled — all requests were getting viewer role with it disabled.
+      # On first load after this change, Frigate will prompt to create an admin user.
 
       detectors.coral = {
         type   = "edgetpu";
@@ -99,10 +97,13 @@
       birdseye = { enabled = true; mode = "objects"; };
 
       cameras.cam1 = {
+        # Pull from go2rtc's RTSP restream rather than directly from the camera.
+        # This means go2rtc holds the single connection to the camera; live view
+        # and recording both use the same already-open stream with no duplication.
         ffmpeg.inputs = [
-          { path  = "rtsp://{FRIGATE_CAM1_USER}:{FRIGATE_CAM1_PASSWORD}@192.168.1.114:554/h264Preview_01_main";
+          { path  = "rtsp://127.0.0.1:8554/cam1";
             roles = [ "record" ]; }
-          { path  = "rtsp://{FRIGATE_CAM1_USER}:{FRIGATE_CAM1_PASSWORD}@192.168.1.114:554/h264Preview_01_sub";
+          { path  = "rtsp://127.0.0.1:8554/cam1_sub";
             roles = [ "detect" ]; }
         ];
         detect  = { enabled = true; width = 640; height = 480; fps = 5; };
@@ -120,6 +121,9 @@
       streams.cam1 = [
         "rtsp://\${FRIGATE_CAM1_USER}:\${FRIGATE_CAM1_PASSWORD}@192.168.1.114:554/h264Preview_01_main"
       ];
+      streams.cam1_sub = [
+        "rtsp://\${FRIGATE_CAM1_USER}:\${FRIGATE_CAM1_PASSWORD}@192.168.1.114:554/h264Preview_01_sub"
+      ];
     };
   };
 
@@ -131,9 +135,7 @@
     EnvironmentFile = "/var/lib/frigate/.env";
   };
 
-  # Camera credentials — file created manually on host, not in git
   systemd.services.frigate.serviceConfig = {
-    EnvironmentFile = "/var/lib/frigate/.env";
     # Ensure storage dirs are owned by frigate before each start.
     # The bind-mount activation creates these as root, so we fix ownership here.
     ExecStartPre = [
