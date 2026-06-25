@@ -1,6 +1,6 @@
 # bard-frigate specific configuration
 
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
 {
   imports = [
@@ -78,10 +78,6 @@
       mqtt.enabled = false;
       auth.enabled = false;
 
-      go2rtc.streams.cam1 = [
-        "rtsp://{FRIGATE_CAM1_USER}:{FRIGATE_CAM1_PASSWORD}@192.168.1.114:554/h264Preview_01_main"
-      ];
-
       detectors.coral = {
         type   = "edgetpu";
         device = "pci";
@@ -113,6 +109,26 @@
         objects.track = [ "person" "car" "dog" "cat" ];
       };
     };
+  };
+
+  # go2rtc handles live view restreaming; frigate NixOS module expects it as a separate service
+  services.go2rtc = {
+    enable = true;
+    settings = {
+      api.listen = "127.0.0.1:1984";
+      # \${} produces a literal ${} in the YAML; go2rtc substitutes from the service environment
+      streams.cam1 = [
+        "rtsp://\${FRIGATE_CAM1_USER}:\${FRIGATE_CAM1_PASSWORD}@192.168.1.114:554/h264Preview_01_main"
+      ];
+    };
+  };
+
+  # Run go2rtc as the frigate user so it can read the same credentials file
+  systemd.services.go2rtc.serviceConfig = {
+    DynamicUser   = lib.mkForce false;
+    User          = lib.mkForce "frigate";
+    Group         = lib.mkForce "frigate";
+    EnvironmentFile = "/var/lib/frigate/.env";
   };
 
   # Camera credentials — file created manually on host, not in git
