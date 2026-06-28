@@ -1,6 +1,6 @@
 # bard-frigate specific configuration
 
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
 {
   imports = [
@@ -79,8 +79,8 @@
       # auth enabled — all requests were getting viewer role with it disabled.
       # On first load after this change, Frigate will prompt to create an admin user.
 
-      # Frigate configures go2rtc with these streams via API at startup.
-      # Having cam1 here also tells the UI that live view restreaming is available.
+      # go2rtc.streams here is UI-only — tells the live view tab that restreaming
+      # is available. The actual streams are configured in services.go2rtc below.
       go2rtc.streams.cam1 = [
         "rtsp://{FRIGATE_CAM1_USER}:{FRIGATE_CAM1_PASSWORD}@192.168.1.114:554/h264Preview_01_main"
       ];
@@ -124,10 +124,27 @@
     };
   };
 
-  # go2rtc provides the process; Frigate configures its streams via API at startup
+  # go2rtc holds the single connection to the camera; Frigate ffmpeg and live view
+  # both consume its RTSP restream. Streams use ${VAR} substitution (go2rtc native).
   services.go2rtc = {
     enable = true;
-    settings.api.listen = "127.0.0.1:1984";
+    settings = {
+      api.listen = "127.0.0.1:1984";
+      streams.cam1 = [
+        "rtsp://\${FRIGATE_CAM1_USER}:\${FRIGATE_CAM1_PASSWORD}@192.168.1.114:554/h264Preview_01_main"
+      ];
+      streams.cam1_sub = [
+        "rtsp://\${FRIGATE_CAM1_USER}:\${FRIGATE_CAM1_PASSWORD}@192.168.1.114:554/h264Preview_01_sub"
+      ];
+    };
+  };
+
+  # go2rtc must run as frigate user to read credentials from the shared env file
+  systemd.services.go2rtc.serviceConfig = {
+    DynamicUser    = lib.mkForce false;
+    User           = lib.mkForce "frigate";
+    Group          = lib.mkForce "frigate";
+    EnvironmentFile = "/var/lib/frigate/.env";
   };
 
   systemd.services.frigate.serviceConfig = {
