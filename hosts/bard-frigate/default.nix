@@ -41,6 +41,8 @@
     "d /home/dylan/storage/frigate            0750 frigate frigate -"
     "d /home/dylan/storage/frigate/recordings 0750 frigate frigate -"
     "d /home/dylan/storage/frigate/clips      0750 frigate frigate -"
+    # Frigate's log API reads from this path (s6-overlay creates it in Docker; we do it here)
+    "d /dev/shm/logs/frigate 0755 frigate frigate -"
   ];
 
   fileSystems."/var/lib/frigate/recordings" = {
@@ -148,14 +150,13 @@
   };
 
   systemd.services.frigate.serviceConfig = {
-    # Frigate needs the env file to substitute {FRIGATE_*} vars before passing
-    # camera URLs to go2rtc's API and to ffmpeg
     EnvironmentFile = "/var/lib/frigate/.env";
-    # Ensure storage dirs are owned by frigate before each start.
-    # The bind-mount activation creates these as root, so we fix ownership here.
     ExecStartPre = [
       "+${pkgs.coreutils}/bin/chown -R frigate:frigate /home/dylan/storage/frigate"
     ];
+    # Route logs to the file Frigate's web UI log viewer expects
+    StandardOutput = lib.mkForce "append:/dev/shm/logs/frigate/current";
+    StandardError  = lib.mkForce "append:/dev/shm/logs/frigate/current";
   };
 
   system.stateVersion = "25.11";
