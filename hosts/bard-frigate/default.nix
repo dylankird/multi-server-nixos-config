@@ -1,6 +1,6 @@
 # bard-frigate specific configuration
 
-{ config, pkgs, lib, ... }:
+{ config, pkgs, ... }:
 
 {
   imports = [
@@ -70,11 +70,23 @@
     enable      = true;
     hostname    = "bard-frigate";
     vaapiDriver = "iHD";
+    # checkConfig = false because RTSP URLs contain {FRIGATE_*} env vars that
+    # can't be resolved at build time in the Nix sandbox
+    checkConfig = false;
 
     settings = {
       mqtt.enabled = false;
       # auth enabled — all requests were getting viewer role with it disabled.
       # On first load after this change, Frigate will prompt to create an admin user.
+
+      # Frigate configures go2rtc with these streams via API at startup.
+      # Having cam1 here also tells the UI that live view restreaming is available.
+      go2rtc.streams.cam1 = [
+        "rtsp://{FRIGATE_CAM1_USER}:{FRIGATE_CAM1_PASSWORD}@192.168.1.114:554/h264Preview_01_main"
+      ];
+      go2rtc.streams.cam1_sub = [
+        "rtsp://{FRIGATE_CAM1_USER}:{FRIGATE_CAM1_PASSWORD}@192.168.1.114:554/h264Preview_01_sub"
+      ];
 
       detectors.coral = {
         type   = "edgetpu";
@@ -112,30 +124,16 @@
     };
   };
 
-  # go2rtc handles live view restreaming; frigate NixOS module expects it as a separate service
+  # go2rtc provides the process; Frigate configures its streams via API at startup
   services.go2rtc = {
     enable = true;
-    settings = {
-      api.listen = "127.0.0.1:1984";
-      # \${} produces a literal ${} in the YAML; go2rtc substitutes from the service environment
-      streams.cam1 = [
-        "rtsp://\${FRIGATE_CAM1_USER}:\${FRIGATE_CAM1_PASSWORD}@192.168.1.114:554/h264Preview_01_main"
-      ];
-      streams.cam1_sub = [
-        "rtsp://\${FRIGATE_CAM1_USER}:\${FRIGATE_CAM1_PASSWORD}@192.168.1.114:554/h264Preview_01_sub"
-      ];
-    };
-  };
-
-  # Run go2rtc as the frigate user so it can read the same credentials file
-  systemd.services.go2rtc.serviceConfig = {
-    DynamicUser   = lib.mkForce false;
-    User          = lib.mkForce "frigate";
-    Group         = lib.mkForce "frigate";
-    EnvironmentFile = "/var/lib/frigate/.env";
+    settings.api.listen = "127.0.0.1:1984";
   };
 
   systemd.services.frigate.serviceConfig = {
+    # Frigate needs the env file to substitute {FRIGATE_*} vars before passing
+    # camera URLs to go2rtc's API and to ffmpeg
+    EnvironmentFile = "/var/lib/frigate/.env";
     # Ensure storage dirs are owned by frigate before each start.
     # The bind-mount activation creates these as root, so we fix ownership here.
     ExecStartPre = [
