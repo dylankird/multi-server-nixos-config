@@ -1,5 +1,7 @@
 # bard-frigate specific configuration
 
+# Note: Edit secrets with: 'sudo vim /var/lib/frigate/.env'
+
 { config, pkgs, lib, ... }:
 
 {
@@ -97,6 +99,20 @@
         "rtsp://{FRIGATE_FRONT_USER}:{FRIGATE_FRONT_PASSWORD}@192.168.1.111:554/h264Preview_01_sub"
       ];
 
+      go2rtc.streams.side = [
+        "rtsp://{FRIGATE_SIDE_USER}:{FRIGATE_SIDE_PASSWORD}@192.168.1.113:554/h264Preview_01_main"
+      ];
+      go2rtc.streams.side_sub = [
+        "rtsp://{FRIGATE_SIDE_USER}:{FRIGATE_SIDE_PASSWORD}@192.168.1.113:554/h264Preview_01_sub"
+      ];
+
+      go2rtc.streams.back = [
+        "rtsp://{FRIGATE_BACK_USER}:{FRIGATE_BACK_PASSWORD}@192.168.1.112:554/h264Preview_01_main"
+      ];
+      go2rtc.streams.back_sub = [
+        "rtsp://{FRIGATE_BACK_USER}:{FRIGATE_BACK_PASSWORD}@192.168.1.112:554/h264Preview_01_sub"
+      ];
+
       detectors.coral = {
         type   = "edgetpu";
         device = "pci";
@@ -144,6 +160,35 @@
         detect  = { enabled = true; width = 640; height = 480; fps = 5; };
         objects.track = [ "person" "car" "dog" "cat" ];
       };
+
+	  cameras.side= {
+        # Pull from go2rtc's RTSP restream rather than directly from the camera.
+        # This means go2rtc holds the single connection to the camera; live view
+        # and recording both use the same already-open stream with no duplication.
+        ffmpeg.inputs = [
+          { path  = "rtsp://127.0.0.1:8554/side";
+            roles = [ "record" ]; }
+          { path  = "rtsp://127.0.0.1:8554/side_sub";
+            roles = [ "detect" ]; }
+        ];
+        detect  = { enabled = true; width = 640; height = 480; fps = 5; };
+        objects.track = [ "person" "car" "dog" "cat" ];
+      };
+
+      cameras.back = {
+        # Pull from go2rtc's RTSP restream rather than directly from the camera.
+        # This means go2rtc holds the single connection to the camera; live view
+        # and recording both use the same already-open stream with no duplication.
+        ffmpeg.inputs = [
+          { path  = "rtsp://127.0.0.1:8554/back";
+            roles = [ "record" ]; }
+          { path  = "rtsp://127.0.0.1:8554/back_sub";
+            roles = [ "detect" ]; }
+        ];
+        detect  = { enabled = true; width = 640; height = 480; fps = 5; };
+        objects.track = [ "person" "car" "dog" "cat" ];
+      };
+
     };
   };
 
@@ -167,6 +212,21 @@
       streams.front_sub = [
         "rtsp://\${FRIGATE_FRONT_USER}:\${FRIGATE_FRONT_PASSWORD}@192.168.1.111:554/h264Preview_01_sub"
       ];
+	  
+      streams.side = [
+        "rtsp://\${FRIGATE_SIDE_USER}:\${FRIGATE_SIDE_PASSWORD}@192.168.1.112:554/h264Preview_01_main"
+      ];
+      streams.side_sub = [
+        "rtsp://\${FRIGATE_SIDE_USER}:\${FRIGATE_SIDE_PASSWORD}@192.168.1.112:554/h264Preview_01_sub"
+      ];
+
+      streams.back = [
+        "rtsp://\${FRIGATE_BACK_USER}:\${FRIGATE_BACK_PASSWORD}@192.168.1.113:554/h264Preview_01_main"
+      ];
+      streams.back_sub = [
+        "rtsp://\${FRIGATE_BACK_USER}:\${FRIGATE_BACK_PASSWORD}@192.168.1.113:554/h264Preview_01_sub"
+      ];
+
     };
   };
 
