@@ -164,7 +164,7 @@
       streams.front = [
         "rtsp://\${FRIGATE_FRONT_USER}:\${FRIGATE_FRONT_PASSWORD}@192.168.1.111:554/h264Preview_01_main"
       ];
-      streams.cam2_sub = [
+      streams.front_sub = [
         "rtsp://\${FRIGATE_FRONT_USER}:\${FRIGATE_FRONT_PASSWORD}@192.168.1.111:554/h264Preview_01_sub"
       ];
     };
