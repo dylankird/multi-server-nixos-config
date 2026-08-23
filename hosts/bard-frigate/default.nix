@@ -83,11 +83,18 @@
 
       # go2rtc.streams here is UI-only — tells the live view tab that restreaming
       # is available. The actual streams are configured in services.go2rtc below.
-      go2rtc.streams.cam1 = [
-        "rtsp://{FRIGATE_CAM1_USER}:{FRIGATE_CAM1_PASSWORD}@192.168.1.114:554/h264Preview_01_main"
+      go2rtc.streams.street = [
+        "rtsp://{FRIGATE_STREET_USER}:{FRIGATE_STREET_PASSWORD}@192.168.1.114:554/h264Preview_01_main"
       ];
-      go2rtc.streams.cam1_sub = [
-        "rtsp://{FRIGATE_CAM1_USER}:{FRIGATE_CAM1_PASSWORD}@192.168.1.114:554/h264Preview_01_sub"
+      go2rtc.streams.street_sub = [
+        "rtsp://{FRIGATE_STREET_USER}:{FRIGATE_STREET_PASSWORD}@192.168.1.114:554/h264Preview_01_sub"
+      ];
+
+      go2rtc.streams.front = [
+        "rtsp://{FRIGATE_FRONT_USER}:{FRIGATE_FRONT_PASSWORD}@192.168.1.111:554/h264Preview_01_main"
+      ];
+      go2rtc.streams.front_sub = [
+        "rtsp://{FRIGATE_FRONT_USER}:{FRIGATE_FRONT_PASSWORD}@192.168.1.111:554/h264Preview_01_sub"
       ];
 
       detectors.coral = {
@@ -110,14 +117,28 @@
 
       birdseye = { enabled = true; mode = "objects"; };
 
-      cameras.cam1 = {
+      cameras.street = {
         # Pull from go2rtc's RTSP restream rather than directly from the camera.
         # This means go2rtc holds the single connection to the camera; live view
         # and recording both use the same already-open stream with no duplication.
         ffmpeg.inputs = [
-          { path  = "rtsp://127.0.0.1:8554/cam1";
+          { path  = "rtsp://127.0.0.1:8554/street";
             roles = [ "record" ]; }
-          { path  = "rtsp://127.0.0.1:8554/cam1_sub";
+          { path  = "rtsp://127.0.0.1:8554/street_sub";
+            roles = [ "detect" ]; }
+        ];
+        detect  = { enabled = true; width = 640; height = 480; fps = 5; };
+        objects.track = [ "person" "car" "dog" "cat" ];
+      };
+
+      cameras.front = {
+        # Pull from go2rtc's RTSP restream rather than directly from the camera.
+        # This means go2rtc holds the single connection to the camera; live view
+        # and recording both use the same already-open stream with no duplication.
+        ffmpeg.inputs = [
+          { path  = "rtsp://127.0.0.1:8554/front";
+            roles = [ "record" ]; }
+          { path  = "rtsp://127.0.0.1:8554/front_sub";
             roles = [ "detect" ]; }
         ];
         detect  = { enabled = true; width = 640; height = 480; fps = 5; };
@@ -132,11 +153,19 @@
     enable = true;
     settings = {
       api.listen = "127.0.0.1:1984";
-      streams.cam1 = [
-        "rtsp://\${FRIGATE_CAM1_USER}:\${FRIGATE_CAM1_PASSWORD}@192.168.1.114:554/h264Preview_01_main"
+
+      streams.street = [
+        "rtsp://\${FRIGATE_STREET_USER}:\${FRIGATE_STREET_PASSWORD}@192.168.1.114:554/h264Preview_01_main"
       ];
-      streams.cam1_sub = [
-        "rtsp://\${FRIGATE_CAM1_USER}:\${FRIGATE_CAM1_PASSWORD}@192.168.1.114:554/h264Preview_01_sub"
+      streams.street_sub = [
+        "rtsp://\${FRIGATE_STREET_USER}:\${FRIGATE_STREET_PASSWORD}@192.168.1.114:554/h264Preview_01_sub"
+      ];
+
+      streams.front = [
+        "rtsp://\${FRIGATE_FRONT_USER}:\${FRIGATE_FRONT_PASSWORD}@192.168.1.111:554/h264Preview_01_main"
+      ];
+      streams.cam2_sub = [
+        "rtsp://\${FRIGATE_FRONT_USER}:\${FRIGATE_FRONT_PASSWORD}@192.168.1.111:554/h264Preview_01_sub"
       ];
     };
   };
