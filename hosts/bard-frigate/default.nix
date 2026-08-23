@@ -106,13 +106,6 @@
         "rtsp://{FRIGATE_SIDE_USER}:{FRIGATE_SIDE_PASSWORD}@192.168.1.113:554/h264Preview_01_sub"
       ];
 
-      go2rtc.streams.side = [
-        "rtsp://{FRIGATE_SIDE_USER}:{FRIGATE_SIDE_PASSWORD}@192.168.1.113:554/h264Preview_01_main"
-      ];
-      go2rtc.streams.side_sub = [
-        "rtsp://{FRIGATE_SIDE_USER}:{FRIGATE_SIDE_PASSWORD}@192.168.1.113:554/h264Preview_01_sub"
-      ];
-
       go2rtc.streams.back = [
         "rtsp://{FRIGATE_BACK_USER}:{FRIGATE_BACK_PASSWORD}@192.168.1.112:554/h264Preview_01_main"
       ];
