@@ -123,7 +123,10 @@
       record = {
         enabled = true;
         retain  = { days = 10; mode = "all"; };
-        events.retain = { default = 30; mode = "motion"; };
+        # Effectively unlimited: motion-tagged events are kept until the disk
+        # fills up. Frigate auto-deletes the oldest recordings once free space
+        # drops below ~1 hour, regardless of this retention value.
+        events.retain = { default = 10000; mode = "motion"; };
       };
 
       snapshots = {
