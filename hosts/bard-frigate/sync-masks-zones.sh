@@ -29,6 +29,7 @@ echo "$FULL_JSON" | jq -S '
       value: (
         (if (.value.motion.mask? // null) != null then {motion: {mask: .value.motion.mask}} else {} end)
         * (if (.value.zones? // {}) != {} then {zones: .value.zones} else {} end)
+        * (if (.value.objects.mask? // null) != null then {objects: {mask: .value.objects.mask}} else {} end)
         * (
             (.value.objects.filters? // {})
             | to_entries
