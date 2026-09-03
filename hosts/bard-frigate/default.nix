@@ -2,7 +2,29 @@
 
 # Note: Edit secrets with: 'sudo vim /var/lib/frigate/.env'
 
+# Masks/zones drawn in the Frigate web UI live in a tmpfs config copy and
+# get wiped on every frigate.service restart (see masks-zones.json below).
+# After editing masks/zones in the UI, run ./sync-masks-zones.sh (on
+# bard-frigate itself, e.g. over ssh) to pull them into masks-zones.json,
+# review the git diff, and commit — that file is merged into the camera
+# configs below and is what makes the masks/zones survive
+# `nixos-rebuild switch`. It's a generated file; don't hand-edit it.
+
 { config, pkgs, lib, ... }:
+
+let
+  masksZonesFile = ./masks-zones.json;
+  masksZones =
+    if builtins.pathExists masksZonesFile
+    then builtins.fromJSON (builtins.readFile masksZonesFile)
+    else { };
+
+  # Merges live-captured motion/zone/object-filter masks (produced by
+  # ./sync-masks-zones.sh, committed to git) on top of a camera's base
+  # config. No-ops before the first sync has ever been run.
+  withMasks = cameraName: baseConfig:
+    lib.recursiveUpdate baseConfig (masksZones.${cameraName} or { });
+in
 
 {
   imports = [
@@ -136,7 +158,7 @@
 
       birdseye = { enabled = true; mode = "objects"; };
 
-      cameras.street = {
+      cameras.street = withMasks "street" {
         # Pull from go2rtc's RTSP restream rather than directly from the camera.
         # This means go2rtc holds the single connection to the camera; live view
         # and recording both use the same already-open stream with no duplication.
@@ -150,7 +172,7 @@
         objects.track = [ "person" "car" "dog" "cat" ];
       };
 
-      cameras.front = {
+      cameras.front = withMasks "front" {
         # Pull from go2rtc's RTSP restream rather than directly from the camera.
         # This means go2rtc holds the single connection to the camera; live view
         # and recording both use the same already-open stream with no duplication.
@@ -164,7 +186,7 @@
         objects.track = [ "person" "car" "dog" "cat" ];
       };
 
-	  cameras.side= {
+	  cameras.side= withMasks "side" {
         # Pull from go2rtc's RTSP restream rather than directly from the camera.
         # This means go2rtc holds the single connection to the camera; live view
         # and recording both use the same already-open stream with no duplication.
@@ -178,7 +200,7 @@
         objects.track = [ "person" "car" "dog" "cat" ];
       };
 
-      cameras.back = {
+      cameras.back = withMasks "back" {
         # Pull from go2rtc's RTSP restream rather than directly from the camera.
         # This means go2rtc holds the single connection to the camera; live view
         # and recording both use the same already-open stream with no duplication.

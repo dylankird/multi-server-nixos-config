@@ -22,6 +22,9 @@
 	ncdu
 	tailscale
 	gptfdisk
+	curl
+	jq
+	yq-go
 
 	# Vim with vimrc:
 	(vim-full.customize {
